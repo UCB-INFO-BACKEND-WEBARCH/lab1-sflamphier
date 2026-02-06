@@ -51,8 +51,61 @@ def check_password_strength(password):
     Hint: Use .isdigit(), .isupper(), .islower() and string.punctuation
     """
     # TODO: Implement this function
-    pass
-
+    
+    score = 0 # Total password strength score (0-100)
+    feedback = [] # So we can see what we are doing wrong and how to improve
+    
+    # 12+ characters: 30 points (instead of 20)
+    if len(password) >= 12:
+        score += 30
+    # 8+ characters: 20 points
+    elif len(password) >= 8:
+        score += 20
+    
+    # Has number: 20 points
+    if any(c.isdigit() for c in password):
+        score += 20
+    else:
+        feedback.append("Add numbers")
+    
+    # Has uppercase: 20 points
+    if any(c.isupper() for c in password):
+        score += 20
+    else:
+        feedback.append("Add uppercase letters")
+    
+    # Has lowercase: 20 points
+    if any(c.islower() for c in password):
+        score += 20
+    else:
+        feedback.append("Add lowercase letters")
+    
+    # Has special char (!@#$%): 20 points
+    special_chars = "!@#$%^&*()-+"
+    if any(c in special_chars for c in password):
+        score += 20
+    else:
+        feedback.append("Add special characters --> !@#$%^&*()-+ ")
+    
+    # Not in common list: 10 points
+    if password not in COMMON_PASSWORDS:
+        score += 10
+    else:
+        feedback.append("Don't use common passwords")
+    
+    # Password strength level
+    strength = "Weak"
+    if score >= 70:
+        strength = "Strong"
+    elif score >= 40:
+        strength = "Medium"
+    
+    return {
+        "password": password,
+        "score": score,
+        "strength": strength,
+        "feedback": feedback
+    }
 
 # ============================================
 # TODO 2: Password Generator
@@ -82,9 +135,33 @@ def generate_password(length=12, use_special=True):
     Hint: Use string.ascii_uppercase, string.ascii_lowercase, 
           string.digits, and random.choice()
     """
-    # TODO: Implement this function
-    pass
 
+    # Ensure minimum of 8
+    length = max(length, 8)
+
+    # Build characters
+    characters = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    special_chars = "!@#$%^&*()-+"
+    if use_special:
+        characters += special_chars
+
+    # Pasword must have one uppercase, one lowercase and one digit
+    password_chars = [
+        random.choice(string.ascii_uppercase),
+        random.choice(string.ascii_lowercase),
+        random.choice(string.digits),
+    ]
+
+    # Include special characters if use_special=True
+    if use_special:
+        password_chars.append(random.choice(special_chars))
+
+    # Fill the rest of the password with random choices
+    while len(password_chars) < length:
+        password_chars.append(random.choice(characters))
+    # Shuffle to avoid predictable ordering
+    random.shuffle(password_chars)
+    return ''.join(password_chars)
 
 # ============================================
 # Simple Testing
